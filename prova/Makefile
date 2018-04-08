@@ -4,6 +4,7 @@
 #		|target: dependecies
 #		|	action
 
+
 # nome file da compilare (senza estensione)
 
 PROG_NAME=sblinka2
@@ -12,9 +13,13 @@ PROG_NAME=sblinka2
 
 PORT=/dev/ttyACM0
 
+
 all: build 
 
 build: 
+	@echo " usage:" 
+	@echo '  $$$  make -> to compile'
+	@echo '  $$$  make program -> to exec' 
 	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c -o $(PROG_NAME).o $(PROG_NAME).c
 	avr-gcc -mmcu=atmega328p $(PROG_NAME).o -o $(PROG_NAME)
 	avr-objcopy -O ihex -R .eeprom $(PROG_NAME) $(PROG_NAME).hex
@@ -24,5 +29,4 @@ program:
 	
 clean:
 	rm -rf *.o *.hex $(PROG_NAME).elf
-
 
