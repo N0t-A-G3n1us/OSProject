@@ -62,13 +62,16 @@ int main( void )
 
 
 
-ISR (USART_RX_vect)
+ISR(USART_RX_vect)
 {	
     ReceivedChar = UDR0;                       // Read data from the RX buffer
-    UDR0 = ReceivedChar; 
+    UDR0 = ReceivedChar;
+    
+    
+	UDR0 = '\n';
+    //TODO aggiungere un char '\n' al carattere ReceivedChar in una nuova stringa e chiamare la send_string passandola come parametro;	
     // Write the data to the TX buffer
 	
-	//TODO aggiungere un char '\n' al carattere ReceivedChar in una nuova stringa e chiamare la send_string passandola come parametro;
 	
 }
 
