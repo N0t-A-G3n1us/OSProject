@@ -22,7 +22,8 @@ build:
 	@echo '  $$$  make     to compile'
 	@echo '  $$$  make program     to exec' 
 	@echo '/////////////////////////////////'
-	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c -o $(PROG_NAME).o $(PROG_NAME).c
+	
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -std=gnu99 -c -o $(PROG_NAME).o $(PROG_NAME).c
 	avr-gcc -mmcu=atmega328p $(PROG_NAME).o -o $(PROG_NAME)
 	avr-objcopy -O ihex -R .eeprom $(PROG_NAME) $(PROG_NAME).hex
 	

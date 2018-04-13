@@ -60,10 +60,8 @@ typedef struct decode_results {
 // Decoded value for NEC when a repeat code is received
 #define REPEAT 0xffffffff
 
-// main class for receiving IR
-typedef struct  IRrecv
-{
 
+   // Once upon a time this was a class
   // IRrecv(int recvpin); -> TODO va fatto costruttore
   void blink13(int blinkflag);
   int decode(decode_results *results);
@@ -85,7 +83,6 @@ typedef struct  IRrecv
   long decodeHash(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
 
-} IRrecv;
 
 // Only used for testing; can remove virtual for shorter code
 #ifdef TEST
@@ -94,10 +91,8 @@ typedef struct  IRrecv
 #define VIRTUAL
 #endif
 
-typedef struct IRsend
-{
-
-  //IRsend() {} -> TODO va fatto costruttore
+	//Once upon a time this was a class
+  //IRsend() {} 
   void sendNEC(unsigned long data, int nbits);
   void sendSony(unsigned long data, int nbits);
   // Neither Sanyo nor Mitsubishi send is implemented yet
@@ -116,8 +111,6 @@ typedef struct IRsend
   void enableIROut(int khz);
   VIRTUAL void mark(int usec);
   VIRTUAL void space(int usec);
-} IRsend
-;
  
 
 
@@ -131,9 +124,3 @@ typedef struct IRsend
 #define MARK_EXCESS 100
 
 #endif
-
-
-
-void main(){
-	
-}

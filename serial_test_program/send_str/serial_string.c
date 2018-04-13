@@ -1,13 +1,16 @@
 // This code waits for a character and transmits the character back (with interrupts)
  //(ECHO program using interrupts)
 
-#include <avr/io.h>
-#include <stdint.h>   // needed for uint8_t
-#include <util/delay.h>
 
+#include <stdint.h>   // needed for uint8_t
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <avr/io.h>
+#include <util/delay.h>
 #include <avr/interrupt.h>
 
-
+#define VERSION_INT	-1	//-1 => no interrupt else interrput version
 
 #define FOSC 16000000    // Clock Speed
 #define BAUD 9600                
@@ -25,6 +28,18 @@ void send_char(char c){
 	UDR0 = c;
 	}
 
+void send_char_noint(char c){
+	
+	while ( !(UCSR0A & (1 << RXC0)) )  // Wait until data is received
+        
+	ReceivedChar = UDR0;                    // Read the data from the RX buffer
+	
+	while ( !(UCSR0A & (1 << UDRE0)) ) // Wait until buffer is empty
+
+	UDR0 = ReceivedChar;                    // Send the data to the TX buffer
+
+	}
+
 void send_string(char s[]){
 	int i =0;
 	
@@ -35,6 +50,33 @@ void send_string(char s[]){
 	}
 }
 
+int send_string_noint(const char * str){
+	int status = -1;
+ 
+    if (str != NULL) {
+        status = 0;
+ 
+         while (*str != '\0') {
+            /* Wait for the transmit buffer to be ready */
+			while ((UCSR0A & (1 << UDRE0)) == 0) {};	
+ 
+            /* Transmit data */
+            char temp= UDR0;	//to free the flag
+            UDR0= *str;
+ 
+            /* If there is a line-feed, add a carriage return */
+            if (*str == '\n') {
+                /* Wait for the transmit buffer to be ready */
+			while ( !(UCSR0A & (1 << UDRE0)) ) // Wait until buffer is empty
+                UCA0TXBUF = '\r';
+            }
+ 
+            str++;
+        }
+    }
+ 
+    return status;
+	}
 
 int main( void )
 {
@@ -46,17 +88,26 @@ int main( void )
     UCSR0B |= (1 << RXCIE0);                    // Enable reciever interrupt
     UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);    // Set frame: 8data, 1 stp
 
-    sei();                                      // enable interrupts
-	
-	char ready_str[MAX_LENGHT]="board ready to comunicate \n";
-	send_string(ready_str);
-	
-    while(1)
-    {
-		//work
-				
-		;										// Main loop, waiting for interrupt to show that a msg arrived
-    }    
+
+	//////////VERSIONE INTERRUPTED
+	#if VERSION_INT
+		sei();                                      // enable interrupts
+		
+		char ready_str[MAX_LENGHT]="board ready to comunicate \n";
+		send_string(ready_str);
+		
+		while(1)
+		{
+			//work
+					
+			;										// Main loop, waiting for interrupt to show that a msg arrived
+		}
+			//////////VERSIONE NON INTERRUPTED
+	#else 
+		char * string = malloc(sizeof(char)*100);	
+		
+		
+    #endif    
 }
 
 
@@ -68,7 +119,6 @@ ISR(USART_RX_vect)
     UDR0 = ReceivedChar;
     
     
-	UDR0 = '\n';
     //TODO aggiungere un char '\n' al carattere ReceivedChar in una nuova stringa e chiamare la send_string passandola come parametro;	
     // Write the data to the TX buffer
 	

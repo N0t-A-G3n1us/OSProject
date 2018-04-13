@@ -1,13 +1,27 @@
 #include "IRremote.h"
-//#include "IRremoteInt.h"
+#include "IRremoteInt.h"
+#include "Functions.h"
 
 #include <stdio.h>
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 
-#define INPUT PORTD7
+#define RECV_PIN PORTD7
+#define FNV_PRIME_32 16777619
+#define FNV_BASIS_32 2166136261
+
+/*	BIT MATH OPERATIONS MACRO */
+//get the bit in bit_pos position in reg register
+#define bit_get(reg,bit_pos) ((reg) & (1<<(bit_pos) ))	
+//set the bit in bit_pos position in reg register
+#define bit_set(reg,bit_pos) ((reg) |= (1<<(bit_pos) ))	
+//clear the bit in bit_pos position in reg register
+#define bit_clear(reg,bit_pos) ((reg) &= ~(1<<(bit_pos) ))	
+//flip the bit in bit_pos position in reg register
+#define bit_flip(reg,bit_pos) ((reg) ^= (1<<(bit_pos) ))	
+//check if the bit in bit_pos in the reg register is one (1) or zero (0)
+#define bit_is_one(reg,bit_pos) (( (reg) & (1<<(bit_pos) ) )> 0)
 
 /* IDE SCHEMA
 /////////////////////////////////
@@ -36,13 +50,13 @@ void loop() {
 */
 
 
+
 volatile irparams_t irparams;
 
 void resume() {
   irparams.rcvstate = STATE_IDLE;
   irparams.rawlen = 0;
 }
-
 
 void enableIRIn() {
   cli();
@@ -64,8 +78,14 @@ void enableIRIn() {
   irparams.rawlen = 0;
 
   // set pin modes
-  pinMode(irparams.recvpin, INPUT);	// TODO settare il la porta del pin come input
-									// è pull up ???
+  //pinMode(irparams.recvpin, INPUT);	
+  //set pin recvpin as input with pull up
+  
+	DDRD &= ~(1 << DDD7); // Clear the PD0 pin
+    // PD0 is now an input
+
+	PORTD |= (1 << RECV_PIN); // turn On the Pull-up
+    // PDO is now an input with pull-up enabled
 }
 
 int decode(decode_results *results) {
@@ -145,7 +165,23 @@ int decode(decode_results *results) {
   return ERR;
 }
 
-
+void main(){
+	
+	decode_results results;
+	
+	//setup
+	enableIRIn();
+	
+	//loop
+	while(1){
+		 if ( decode(&results)) {
+			//Serial.println(results.value, HEX);
+			resume(); // Receive the next value
+				}
+	}
+	
+	
+}
 
 
 
