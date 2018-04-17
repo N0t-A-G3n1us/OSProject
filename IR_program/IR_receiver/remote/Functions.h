@@ -49,50 +49,9 @@ void USART_putstring(char* StringPtr){
 ////////////////////		[IR PART]		/////////////
 
 
-#ifdef DEBUG
-int MATCH(int measured, int desired) {
-  Serial.print("Testing: ");
-  Serial.print(TICKS_LOW(desired), DEC);
-  Serial.print(" <= ");
-  Serial.print(measured, DEC);
-  Serial.print(" <= ");
-  Serial.println(TICKS_HIGH(desired), DEC);
-  return measured >= TICKS_LOW(desired) && measured <= TICKS_HIGH(desired);
-}
-
-int MATCH_MARK(int measured_ticks, int desired_us) {
-  Serial.print("Testing mark ");
-  Serial.print(measured_ticks * USECPERTICK, DEC);
-  Serial.print(" vs ");
-  Serial.print(desired_us, DEC);
-  Serial.print(": ");
-  Serial.print(TICKS_LOW(desired_us + MARK_EXCESS), DEC);
-  Serial.print(" <= ");
-  Serial.print(measured_ticks, DEC);
-  Serial.print(" <= ");
-  Serial.println(TICKS_HIGH(desired_us + MARK_EXCESS), DEC);
-  return measured_ticks >= TICKS_LOW(desired_us + MARK_EXCESS) && measured_ticks <= TICKS_HIGH(desired_us + MARK_EXCESS);
-}
-
-int MATCH_SPACE(int measured_ticks, int desired_us) {
-  Serial.print("Testing space ");
-  Serial.print(measured_ticks * USECPERTICK, DEC);
-  Serial.print(" vs ");
-  Serial.print(desired_us, DEC);
-  Serial.print(": ");
-  Serial.print(TICKS_LOW(desired_us - MARK_EXCESS), DEC);
-  Serial.print(" <= ");
-  Serial.print(measured_ticks, DEC);
-  Serial.print(" <= ");
-  Serial.println(TICKS_HIGH(desired_us - MARK_EXCESS), DEC);
-  return measured_ticks >= TICKS_LOW(desired_us - MARK_EXCESS) && measured_ticks <= TICKS_HIGH(desired_us - MARK_EXCESS);
-}
-#else
 int MATCH(int measured, int desired) {return measured >= TICKS_LOW(desired) && measured <= TICKS_HIGH(desired);}
 int MATCH_MARK(int measured_ticks, int desired_us) {return MATCH(measured_ticks, (desired_us + MARK_EXCESS));}
 int MATCH_SPACE(int measured_ticks, int desired_us) {return MATCH(measured_ticks, (desired_us - MARK_EXCESS));}
-// Debugging versions are in IRremote.cpp
-#endif
 
 long decodeNEC(decode_results *results) {
   long data = 0;
@@ -623,6 +582,18 @@ long decodeSAMSUNG(decode_results *results) {
   return DECODED;
 }
 
+int compare(unsigned int oldval, unsigned int newval) {
+  if (newval < oldval * .8) {
+    return 0;
+  } 
+  else if (oldval < newval * .8) {
+    return 2;
+  } 
+  else {
+    return 1;
+  }
+}
+
 long decodeHash(decode_results *results) {
   // Require at least 6 samples to prevent triggering on noise
   if (results->rawlen < 6) {
@@ -640,14 +611,4 @@ long decodeHash(decode_results *results) {
   return DECODED;
 }
 
-int compare(unsigned int oldval, unsigned int newval) {
-  if (newval < oldval * .8) {
-    return 0;
-  } 
-  else if (oldval < newval * .8) {
-    return 2;
-  } 
-  else {
-    return 1;
-  }
-}
+

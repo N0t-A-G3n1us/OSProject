@@ -1,9 +1,9 @@
-#include "IRremote.h"
-#include "IRremoteInt.h"
-#include "Functions.h"
-#include "pins_arduino.h"
-#include "wiring_private.h"
-#include "MyArduino.h"
+#include "remote/IRremote.h"
+#include "remote/IRremoteInt.h"
+#include "remote/Functions.h"
+#include "core/pins_arduino.h"
+#include "core/wiring_private.h"
+#include "core/MyArduino.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +48,7 @@ void setup()
 
 void loop() {
   if (irrecv.decode(&results)) {
-    Serial.println(results.value, HEX);
+    USART_putstring(results.value, HEX);
     irrecv.resume(); // Receive the next value
   }
 }
@@ -113,62 +113,62 @@ int decode(decode_results *results) {
   }
   
   //TODO sostituire tutti i serial.println con usart...
-#ifdef DEBUG
-  Serial.println("Attempting NEC decode");
+#if MYTEST
+  USART_putstring("Attempting NEC decode\n");
 #endif
   if (decodeNEC(results)) {
     return DECODED;
   }
-#ifdef DEBUG
-  Serial.println("Attempting Sony decode");
+#if MYTEST
+  USART_putstring("Attempting Sony decode\n");
 #endif
   if (decodeSony(results)) {
     return DECODED;
   }
-#ifdef DEBUG
-  Serial.println("Attempting Sanyo decode");
+#if MYTEST
+  USART_putstring("Attempting Sanyo decode\n");
 #endif
   if (decodeSanyo(results)) {
     return DECODED;
   }
-#ifdef DEBUG
-  Serial.println("Attempting Mitsubishi decode");
+#if MYTEST
+  USART_putstring("Attempting Mitsubishi decode\n");
 #endif
   if (decodeMitsubishi(results)) {
     return DECODED;
   }
-#ifdef DEBUG
-  Serial.println("Attempting RC5 decode");
+#if MYTEST
+  USART_putstring("Attempting RC5 decode\n");
 #endif  
   if (decodeRC5(results)) {
     return DECODED;
   }
-#ifdef DEBUG
-  Serial.println("Attempting RC6 decode");
+#if MYTEST
+  USART_putstring("Attempting RC6 decode\n");
 #endif 
   if (decodeRC6(results)) {
     return DECODED;
   }
-#ifdef DEBUG
-    Serial.println("Attempting Panasonic decode");
+#if MYTEST
+    USART_putstring("Attempting Panasonic decode\n");
 #endif 
     if (decodePanasonic(results)) {
         return DECODED;
     }
-#ifdef DEBUG
-    Serial.println("Attempting LG decode");
+#if MYTEST
+    USART_putstring("Attempting LG decode\n");
 #endif 
     if (decodeLG(results)) {
         return DECODED;
     }
-#ifdef DEBUG
-    Serial.println("Attempting JVC decode");
+#if MYTEST
+    USART_putstring("Attempting JVC decode\n");
 #endif 
     if (decodeJVC(results)) {
         return DECODED;
     }
-#ifdef DEBUG
-  Serial.println("Attempting SAMSUNG decode");
+#if MYTEST
+  USART_putstring("Attempting SAMSUNG decode\n");
 #endif
   if (decodeSAMSUNG(results)) {
     return DECODED;
@@ -183,6 +183,8 @@ int decode(decode_results *results) {
   resume();
   return ERR;
 }
+
+////////////////////////////////////////////////////////// ------------MAIN-------------
 
 int main(void){
 	
@@ -203,15 +205,10 @@ int main(void){
 	//loop
 	while(1){
 			//digital read testing 
-		#if MYTEST
-			  uint8_t dig_read = (uint8_t)(PINB & _BV(3)) == 0; // digitalRead (11);	//bloccante ?
-			  cli();
-			  USART_send('a');	//non va 
-			  sei();
-		#else
+		
 		
 		 if ( decode(&results) ) {
-			//Serial.println(results.value, HEX);
+			//USART_putstring(results.value, HEX);
 						
 			ultoa(results.value, decoded_buffer, HEX); //pass results value into a string
 			cli();
@@ -221,9 +218,7 @@ int main(void){
 			sei();
 			resume(); // Receive the next value
 		}
-		
-		#endif
-			
+				
 	    _delay_ms(100);
 	}
 	
@@ -366,10 +361,6 @@ int digitalRead(uint8_t pin)
 ////////////////////////////////////////////////////////////////  INTERRUPT MANAGEMENT
 
 
-
-
-#if ! MYTEST
-
 ISR(TIMER_INTR_NAME)
 {
   TIMER_RESET;
@@ -438,6 +429,4 @@ ISR(TIMER_INTR_NAME)
     }
   }
 }
-
-#endif
 
