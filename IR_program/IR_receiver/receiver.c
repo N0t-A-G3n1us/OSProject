@@ -13,8 +13,9 @@
 #include <util/delay.h>
 
 #define HEX 16
-#define RECV_PIN 11	//questo è proprio il pin! ( D11)
-#define LED PORTB0
+#define RECV_PIN 8//questo è proprio il pin! ( D11)
+#define RECV_PINX PINB0	
+#define RECV_DDX DDB0
 #define FNV_PRIME_32 16777619
 #define FNV_BASIS_32 2166136261
 
@@ -99,7 +100,7 @@ void enableIRIn() {
     // PB3 is now an input with pull-up enabled
 	*/
 	
-	DDRB &= ~_BV(3);
+	DDRB &= ~(1<<RECV_DDX); // Clear the PB0 pin che ora è un input
 	
 	
 }
@@ -375,9 +376,7 @@ ISR(TIMER_INTR_NAME)
 
   //uint8_t irdata = (uint8_t)digitalRead(irparams.recvpin);	// <- cosi non va 
 
-  uint8_t timer = digitalPinToTimer(RECV_PIN);
-  if (timer != NOT_ON_TIMER) turnOffPWM(timer);  
-  uint8_t irdata = (uint8_t)(PINB & _BV(3) ) == 0; // digitalRead (11);
+  uint8_t irdata = (uint8_t)(PINB & (1<<RECV_PINX) ) == 0; // digitalRead (11);
 
   irparams.timer++; // One more 50us tick
   if (irparams.rawlen >= RAWBUF) {
