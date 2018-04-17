@@ -505,16 +505,16 @@ extern volatile irparams_t irparams;
 #define BLINKLED_OFF() (digitalWrite(CORE_LED0_PIN, LOW))
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define BLINKLED       13
-#define BLINKLED_ON()  (PORTB |= B10000000)
-#define BLINKLED_OFF() (PORTB &= B01111111)
+#define BLINKLED_ON()  (PORTB |= 10000000)			//chanded all B10...0 to 10...0
+#define BLINKLED_OFF() (PORTB &= 01111111)
 #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
 #define BLINKLED       0
-#define BLINKLED_ON()  (PORTD |= B00000001)
-#define BLINKLED_OFF() (PORTD &= B11111110)
+#define BLINKLED_ON()  (PORTD |= 00000001)
+#define BLINKLED_OFF() (PORTD &= 11111110)
 #else
 #define BLINKLED       13
-#define BLINKLED_ON()  (PORTB |= B00100000)
-#define BLINKLED_OFF() (PORTB &= B11011111)
+#define BLINKLED_ON()  (PORTB |= 00100000)
+#define BLINKLED_OFF() (PORTB &= 11011111)
 #endif
 
 #endif

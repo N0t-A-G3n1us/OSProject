@@ -64,10 +64,13 @@ typedef struct decode_results {
    // Once upon a time this was a class
   // IRrecv(int recvpin); -> TODO va fatto costruttore
   void blink13(int blinkflag);
+/* 
   int decode(decode_results *results);
   void enableIRIn();
   void resume();
+*/
 
+/*
   // These are called by decode
   int getRClevel(decode_results *results, int *offset, int *used, int t1);
   long decodeNEC(decode_results *results);
@@ -82,7 +85,7 @@ typedef struct decode_results {
   long decodeSAMSUNG(decode_results *results);
   long decodeHash(decode_results *results);
   int compare(unsigned int oldval, unsigned int newval);
-
+*/
 
 // Only used for testing; can remove virtual for shorter code
 #ifdef TEST
