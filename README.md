@@ -2,7 +2,7 @@
 Operative System course project made by 2 students
 
 
-PROJECT REQUIREMENTS
+PROJECT REQUIREMENTS/CHOICES
 
 5. On Arduino (2 people)
    NO USING OF ARDUINO IDE, BARE METAL PROGRAMMING
