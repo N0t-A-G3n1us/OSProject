@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -176,6 +177,9 @@ int decode(decode_results *results) {
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
+#if MYTEST
+  USART_putstring("Attempting SAMSUNG decode\n");
+#endif
   if (decodeHash(results)) {
     return DECODED;
   }
@@ -211,11 +215,14 @@ int main(void){
 			//USART_putstring(results.value, HEX);
 						
 			ultoa(results.value, decoded_buffer, HEX); //pass results value into a string
-			cli();
+			//cli();
 			//USART_putstring("Received:\n");
+			char* type_str = strcpy(malloc(20), check_type(results.decode_type) );
+			
+			USART_putstring(type_str);
 			USART_putstring(decoded_buffer);
 			USART_send('\n');
-			sei();
+			//sei();
 			resume(); // Receive the next value
 		}
 				
@@ -368,6 +375,7 @@ ISR(TIMER_INTR_NAME)
   //uint8_t irdata = (uint8_t)digitalRead(irparams.recvpin);	// <- cosi non va 
 
   uint8_t irdata = (uint8_t)(PINB & (1<<RECV_PINX) ) == 0; // digitalRead (11);
+	
 
   irparams.timer++; // One more 50us tick
   if (irparams.rawlen >= RAWBUF) {

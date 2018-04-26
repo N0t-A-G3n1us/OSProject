@@ -68,7 +68,7 @@ long decodeNEC(decode_results *results) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = NEC;
-    //return DECODED;
+    return DECODED;
   }
   if (irparams.rawlen < 2 * NEC_BITS + 4) {
     return ERR;
@@ -114,8 +114,8 @@ long decodeSony(decode_results *results) {
     // Serial.print("IR Gap found: ");
     results->bits = 0;
     results->value = REPEAT;
-    results->decode_type = SONY;
-    //return DECODED;
+    results->decode_type = SANYO;
+    return DECODED;
   }
   offset++;
 
@@ -171,7 +171,7 @@ long decodeSanyo(decode_results *results) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = SANYO;
-    //return DECODED;
+    return DECODED;
   }
   offset++;
 
@@ -306,12 +306,12 @@ int getRClevel(decode_results *results, int *offset, int *used, int t1) {
     *used = 0;
     (*offset)++;
   }
-#ifdef DEBUG
+#ifdef MYTEST
   if (val == MARK) {
-    Serial.println("MARK");
+    USART_putstring("MARK");
   } 
   else {
-    Serial.println("SPACE");
+    USART_putstring("SPACE");
   }
 #endif
   return val;   
@@ -492,7 +492,7 @@ long decodeJVC(decode_results *results) {
         results->bits = 0;
         results->value = REPEAT;
         results->decode_type = JVC;
-        //return DECODED;
+        return DECODED;
     } 
     // Initial mark
     if (!MATCH_MARK(results->rawbuf[offset], JVC_HDR_MARK)) {
@@ -549,7 +549,7 @@ long decodeSAMSUNG(decode_results *results) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = SAMSUNG;
-    //return DECODED;
+    return DECODED;
   }
   if (irparams.rawlen < 2 * SAMSUNG_BITS + 4) {
     return ERR;

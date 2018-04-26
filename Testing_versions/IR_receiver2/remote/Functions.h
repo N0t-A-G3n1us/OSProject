@@ -53,6 +53,43 @@ int MATCH(int measured, int desired) {return measured >= TICKS_LOW(desired) && m
 int MATCH_MARK(int measured_ticks, int desired_us) {return MATCH(measured_ticks, (desired_us + MARK_EXCESS));}
 int MATCH_SPACE(int measured_ticks, int desired_us) {return MATCH(measured_ticks, (desired_us - MARK_EXCESS));}
 
+
+
+char * check_type(int t){
+	
+	switch (t) {
+		case  NEC:
+			return "NEC\n";
+		case SONY :
+			return "SONY\n";
+		case RC5 :
+			return "RC5\n";
+		case RC6 :
+			return "RC6\n";
+		case DISH :
+			return "DISH\n";
+		case SHARP :
+			return "SHARP\n";
+		case PANASONIC :
+			return "PANASONIC\n";
+		case JVC :
+			return "JVC\n";
+		case SANYO :
+			return "SANYO\n";
+		case MITSUBISHI :
+			return "MITSHUBISHI\n";
+		case SAMSUNG :
+			return "SAMSUNG\n";
+		case LG :
+			return "LG\n";
+		case UNKNOWN :
+			return "UNKNOWN\n";
+		}
+	
+	}
+
+
+
 long decodeNEC(decode_results *results) {
   long data = 0;
   int offset = 1; // Skip first space
@@ -114,8 +151,8 @@ long decodeSony(decode_results *results) {
     // Serial.print("IR Gap found: ");
     results->bits = 0;
     results->value = REPEAT;
-    results->decode_type = SANYO;
-    return DECODED;
+    results->decode_type = SONY;
+   // return DECODED;
   }
   offset++;
 
@@ -171,7 +208,7 @@ long decodeSanyo(decode_results *results) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = SANYO;
-    return DECODED;
+    //return DECODED;
   }
   offset++;
 
@@ -492,7 +529,7 @@ long decodeJVC(decode_results *results) {
         results->bits = 0;
         results->value = REPEAT;
         results->decode_type = JVC;
-        return DECODED;
+        //return DECODED;
     } 
     // Initial mark
     if (!MATCH_MARK(results->rawbuf[offset], JVC_HDR_MARK)) {
@@ -549,7 +586,7 @@ long decodeSAMSUNG(decode_results *results) {
     results->bits = 0;
     results->value = REPEAT;
     results->decode_type = SAMSUNG;
-    return DECODED;
+    //return DECODED;
   }
   if (irparams.rawlen < 2 * SAMSUNG_BITS + 4) {
     return ERR;

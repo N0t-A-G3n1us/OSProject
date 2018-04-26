@@ -13,7 +13,7 @@
 #include <util/delay.h>
 
 #define HEX 16
-#define RECV_PIN 8//questo è proprio il pin! ( D11)
+#define RECV_PIN 8 //questo è proprio il pin! 
 #define RECV_PINX PINB0	
 #define RECV_DDX DDB0
 #define FNV_PRIME_32 16777619
@@ -30,6 +30,38 @@
 #define bit_flip(reg,bit_pos) ((reg) ^= (1<<(bit_pos) ))	
 //check if the bit in bit_pos in the reg register is one (1) or zero (0)
 #define bit_is_one(reg,bit_pos) (( (reg) & (1<<(bit_pos) ) )> 0)
+
+/* 					PORT SCHEMA          
+ * 
+ *                            +-----+
+         +----[PWR]-------------------| USB |--+
+         |                            +-----+  |
+         |         GND/RST2  [ ][ ]            |
+         |       MOSI2/SCK2  [ ][ ]  A5/SCL[ ] |   C5 
+         |          5V/MISO2 [ ][ ]  A4/SDA[ ] |   C4 
+         |                             AREF[ ] |
+         |                              GND[ ] |
+         | [ ]N/C                    SCK/13[ ] |   B5
+         | [ ]IOREF                 MISO/12[ ] |   .
+         | [ ]RST                   MOSI/11[ ]~|   .
+         | [ ]3V3    +---+               10[ ]~|   .
+         | [ ]5v    -| A |-               9[ ]~|   .
+         | [ ]GND   -| R |-               8[ ] |   B0
+         | [ ]GND   -| D |-                    |
+         | [ ]Vin   -| U |-               7[ ] |   D7
+         |          -| I |-               6[ ]~|   .
+         | [ ]A0    -| N |-               5[ ]~|   .
+         | [ ]A1    -| O |-               4[ ] |   .
+         | [ ]A2     +---+           INT1/3[ ]~|   .
+         | [ ]A3                     INT0/2[ ] |   .
+         | [ ]A4/SDA  RST SCK MISO     TX>1[ ] |   .
+         | [ ]A5/SCL  [ ] [ ] [ ]      RX<0[ ] |   D0
+         |            [ ] [ ] [ ]              |
+         |  UNO_R3    GND MOSI 5V  ____________/
+          \_______________________/
+		  
+		  http://busyducks.com/ascii-art-arduinos
+*/
 
 /* IDE SCHEMA
 /////////////////////////////////
@@ -112,7 +144,7 @@ int decode(decode_results *results) {
     return ERR;
   }
   
-  //TODO sostituire tutti i serial.println con usart...
+  
 #if MYTEST
   USART_putstring("Attempting NEC decode\n");
 #endif
@@ -173,9 +205,15 @@ int decode(decode_results *results) {
   if (decodeSAMSUNG(results)) {
     return DECODED;
   }
+   
+  
+   
   // decodeHash returns a hash on any input.
   // Thus, it needs to be last in the list.
   // If you add any decodes, add them before this.
+  #if MYTEST
+  USART_putstring("Recurring to hash decode\n");
+	#endif
   if (decodeHash(results)) {
     return DECODED;
   }
@@ -194,28 +232,24 @@ int main(void){
 	char hello_str[]="ready to receive\n";
 	char decoded_buffer [sizeof(unsigned long)*8+1];
 	 
-	 
 	enableIRIn();
-	cli();	
+	
 	USART_init();
 	USART_putstring(hello_str);
-	sei();
 	
 	
 	//loop
 	while(1){
-			//digital read testing 
-		
 		
 		 if ( decode(&results) ) {
-			//USART_putstring(results.value, HEX);
+			
 						
 			ultoa(results.value, decoded_buffer, HEX); //pass results value into a string
-			cli();
-			//USART_putstring("Received:\n");
+			
+			USART_putstring("Received:\n");
 			USART_putstring(decoded_buffer);
 			USART_send('\n');
-			sei();
+			
 			resume(); // Receive the next value
 		}
 				
@@ -227,7 +261,7 @@ int main(void){
 	
 }
 
-////////////////////////////	/////////////////////////////////////////////////////////7777   TO COPY DIGITAL READ
+////////////////////////////	/////////////////////////////////////////////////////////   TO COPY DIGITAL READ
 
 static void turnOffPWM(uint8_t timer)
 {
@@ -367,7 +401,7 @@ ISR(TIMER_INTR_NAME)
 
   //uint8_t irdata = (uint8_t)digitalRead(irparams.recvpin);	// <- cosi non va 
 
-  uint8_t irdata = (uint8_t)(PINB & (1<<RECV_PINX) ) == 0; // digitalRead (11);
+  uint8_t irdata = (uint8_t)(PINB & (1<<RECV_PINX) ) == 0; // digitalRead (8);
 
   irparams.timer++; // One more 50us tick
   if (irparams.rawlen >= RAWBUF) {

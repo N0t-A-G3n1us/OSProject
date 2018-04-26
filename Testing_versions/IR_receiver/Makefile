@@ -13,7 +13,7 @@ PROG_NAME = receiver
 # flag che indica se siamo in fase di testing
 TEST_FLAG = 0
 # porta da modificare in base a quale è connesso arduino (possibile vederlo da ide)
-PORT = COM3
+PORT = /dev/ttyACM0
 
 
 all: build 

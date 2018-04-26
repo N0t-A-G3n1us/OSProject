@@ -1,0 +1,7 @@
+HASH AVR:
+
+	tasto 1: 54b0f149
+
+HASH IDE:
+	
+	tasto 1: 9716BE3F
